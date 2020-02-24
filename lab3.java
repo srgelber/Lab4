@@ -40,6 +40,8 @@ public class lab3 {
             put("ra", 0);
         }};
 
+
+
         Dictionary labelDict = new Hashtable();
         Scanner scanner = new Scanner(new File(args[0]));
         int count = 0;
@@ -77,9 +79,14 @@ public class lab3 {
                 lineCount += 1;
             }
         }
-        //System.out.print(instructionArray);
+        System.out.print(instructionArray);
 
         scanner.close();
+
+
+        //lab 4
+        ArrayList<String> pipe_regs = new ArrayList<String>(Arrays.asList("empty","empty","empty","empty"));
+        int pr_cap = 4;
 
         // start of lab3
         int[] dataMem = new int[8192];
@@ -100,6 +107,10 @@ public class lab3 {
 
         while (!input[0].equals("q")){
             System.out.print("mips> ");
+
+
+            //check pipe regs here
+
 
             if(scriptFlag == true){
                 if(myObj.hasNext()){
@@ -124,6 +135,7 @@ public class lab3 {
 
             // interactive input
             if (input[0].equals("s")){
+
                  int iter = 1;
                  int cnt = 0;
 
@@ -138,6 +150,19 @@ public class lab3 {
                      ArrayList currCmd = instructionArray.get(currPos);
 
                      //System.out.println(currCmd);
+
+                     int pr_location = pr_cap - 1;
+                     while (pr_location > -1){
+                         if (pr_location == 0) {
+                             pipe_regs.set(0, (String) currCmd.get(0));
+                         }
+                         else {
+
+                             pipe_regs.set(pr_location, pipe_regs.get(pr_location - 1));
+                         }
+
+                         pr_location--;
+                     }
 
                      if (currCmd.get(0).equals("add")){
 
@@ -270,6 +295,7 @@ public class lab3 {
                  }
 
                 System.out.println("\t" + iter + " instruction(s) executed");
+                System.out.println(pipe_regs);
             }
             else if (input[0].equals("r")) {
 
@@ -653,6 +679,11 @@ public class lab3 {
         //return what should be the final line in binary
         return outputList;
     }
+
+    public static void update_pipe_regs(String inst, ArrayList<String> pipe_regs){
+
+    }
+
     //checks for blank lines
     public static boolean isBlankLine(String string){
         return string == null || string.trim().isEmpty();
