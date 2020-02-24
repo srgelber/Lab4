@@ -41,7 +41,6 @@ public class lab3 {
         }};
 
 
-
         Dictionary labelDict = new Hashtable();
         Scanner scanner = new Scanner(new File(args[0]));
         int count = 0;
@@ -83,10 +82,18 @@ public class lab3 {
 
         scanner.close();
 
-
         //lab 4
         ArrayList<String> pipe_regs = new ArrayList<String>(Arrays.asList("empty","empty","empty","empty"));
         int pr_cap = 4;
+
+        int if_id = 0;
+        int id_exe = 1;
+        int exe_mem = 2;
+        int mem_wb = 3;
+
+        int br_flag = 0;
+        int lw_flag = 0;
+        int j_flag = 0;
 
         // start of lab3
         int[] dataMem = new int[8192];
@@ -110,6 +117,13 @@ public class lab3 {
 
 
             //check pipe regs here
+            /*if (pipe_regs.get(exe_mem).equals("lw") && ){
+                lw_flag = 1;
+
+                String temp = pipe_regs.get(id_exe);
+                pipe_regs.set(id_exe, "stall");
+                pipe_regs.set(if_id, "temp");
+            }*/
 
 
             if(scriptFlag == true){
@@ -119,8 +133,6 @@ public class lab3 {
                 else{
                     System.exit(0);
                 }
-            }
-            else{
                 input = myObj.nextLine().trim().split(" ");
             }
             if(scriptFlag == true){
@@ -154,7 +166,7 @@ public class lab3 {
                      int pr_location = pr_cap - 1;
                      while (pr_location > -1){
                          if (pr_location == 0) {
-                             pipe_regs.set(0, (String) currCmd.get(0));
+                             pipe_regs.set(0, (String) currCmd.toString());
                          }
                          else {
 
