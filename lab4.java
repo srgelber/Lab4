@@ -65,6 +65,7 @@ public class lab4 {
         scanner = new Scanner(new File(args[0]));
         int lineCount = 0;
         ArrayList<ArrayList<String>> instructionArray = new ArrayList<ArrayList<String>>();
+        int inst_count = instructionArray.size();
         while(scanner.hasNextLine()){
             String line0 = scanner.nextLine().replaceAll(":(?!$)", ": ");
             line0 = line0.replaceAll("#(?!$)", " #");
@@ -102,6 +103,7 @@ public class lab4 {
 
         int lw_flag = 0;
         int lw_timer = 0;
+        int lw_justset = 0;
 
         int j_flag = 0;
 
@@ -183,22 +185,31 @@ public class lab4 {
                      cyc_cnt++;
 
                      //lw check
+                     
                      if (lw_flag == 1){
 
+                     
+                         
                          lw_timer++;
-
+                         
                          if (lw_timer == 2){
                              ArrayList<String> temp = pipe_regs.get(id_exe);
+                             ArrayList<String> temp2 = pipe_regs.get(exe_mem);
                              ArrayList<String> stall = new ArrayList<String>(Arrays.asList("stall"));
                              pipe_regs.set(id_exe, stall);
                              pipe_regs.set(exe_mem, temp);
+                             pipe_regs.set(mem_wb, temp2);
 
                              currPos--;
 
                              lw_flag = 0;
                              lw_timer = 0;
-                         }
+                             lw_justset = 1;
 
+                         }
+                         
+
+                         
 
                      }
 
@@ -230,7 +241,7 @@ public class lab4 {
 
                      }
 
-                     if (lw_timer == 0 && br_timer == 0){   // squash check
+                     if (lw_timer == 0 && br_timer == 0 && lw_justset != 1){   // squash check
                      if (currCmd.get(0).equals("add")){
 
                          String destReg = (String) currCmd.get(1);
@@ -307,7 +318,10 @@ public class lab4 {
                          String offset = (String) currCmd.get(3);
 
                          if (registers.get(readReg1) == registers.get(readReg2)) {
+                         	 int temp3 = currPos;
                              currPos = (int) labelDict.get(offset) - 1;
+                             temp3 = currPos - temp3;
+                             inst_count = inst_count - temp3;
 
                              currPos-=3;
 
@@ -321,7 +335,11 @@ public class lab4 {
                          String offset = (String) currCmd.get(3);
 
                          if (registers.get(readReg1) != registers.get(readReg2)) {
+                             int temp3 = currPos;
                              currPos = (int) labelDict.get(offset) - 1;
+                             temp3 = currPos - temp3;
+                             inst_count = inst_count - temp3;
+
 
                              currPos-=3;
 
@@ -394,12 +412,17 @@ public class lab4 {
                      if (lw_timer != 2) currPos++;
 
                      registers.put("pc", currPos);
+                     lw_justset = 0;
+                     System.out.println("cyc = " + cyc_cnt);
 
                     cnt++;
                  }
 
-                System.out.println("\t" + iter + " instruction(s) executed");
-                System.out.println(pipe_regs);
+                //System.out.println("\t" + iter + " instruction(s) executed");
+                //System.out.println(pipe_regs);
+                System.out.println("\npc      if/id   id/exe  exe/mem mem/wb");
+                System.out.println(registers.get("pc")+"       "+pipe_regs.get(0).get(0)+"   "+pipe_regs.get(1).get(0)+"   "+pipe_regs.get(2).get(0)+"   "+pipe_regs.get(3).get(0));
+                System.out.print("\n");
             }
             else if (input[0].equals("r")) {
 
@@ -430,18 +453,24 @@ public class lab4 {
 
                         if (lw_timer == 2){
                             ArrayList<String> temp = pipe_regs.get(id_exe);
-                            ArrayList<String> stall = new ArrayList<String>(Arrays.asList("stall"));
-                            pipe_regs.set(id_exe, stall);
-                            pipe_regs.set(exe_mem, temp);
+                             ArrayList<String> temp2 = pipe_regs.get(exe_mem);
+                             ArrayList<String> stall = new ArrayList<String>(Arrays.asList("stall"));
+                             pipe_regs.set(id_exe, stall);
+                             pipe_regs.set(exe_mem, temp);
+                             pipe_regs.set(mem_wb, temp2);
 
-                            currPos--;
+                             currPos--;
 
-                            lw_flag = 0;
-                            lw_timer = 0;
-                        }
+
+                             lw_flag = 0;
+                             lw_timer = 0;
+                             lw_justset = 1;                        
+                         }
+
 
 
                     }
+
 
                     if (j_flag == 1){
 
@@ -471,7 +500,7 @@ public class lab4 {
 
                     }
 
-                    if (lw_timer == 0 && br_timer == 0){   // squash check
+                    if (lw_timer == 0 && br_timer == 0 && lw_justset != 1){   // squash check
                         if (currCmd.get(0).equals("add")){
 
                             String destReg = (String) currCmd.get(1);
@@ -548,7 +577,11 @@ public class lab4 {
                             String offset = (String) currCmd.get(3);
 
                             if (registers.get(readReg1) == registers.get(readReg2)) {
-                                currPos = (int) labelDict.get(offset) - 1;
+                                int temp3 = currPos;
+                             	currPos = (int) labelDict.get(offset) - 1;
+                            	temp3 = currPos - temp3;
+                             	inst_count = inst_count - temp3;
+
 
                                 currPos-=3;
 
@@ -562,7 +595,11 @@ public class lab4 {
                             String offset = (String) currCmd.get(3);
 
                             if (registers.get(readReg1) != registers.get(readReg2)) {
-                                currPos = (int) labelDict.get(offset) - 1;
+                                int temp3 = currPos;
+                             	currPos = (int) labelDict.get(offset) - 1;
+                             	temp3 = currPos - temp3;
+                             	inst_count = inst_count - temp3;
+
 
                                 currPos-=3;
 
@@ -633,15 +670,26 @@ public class lab4 {
                     }
 
                     if (lw_timer != 2) currPos++;
+                    lw_justset = 0;
 
                     registers.put("pc", currPos);
 
 
-                    // ADD STUFF
+
 
 
 
                 }
+                cyc_cnt += 4;
+                float cpi = (float)cyc_cnt/(float)instructionArray.size();
+
+                System.out.print("\n");
+                System.out.println("Program Complete");
+                System.out.print("CPI = ");
+                System.out.printf("%.3f",cpi);
+                System.out.println("	Cycles = " + cyc_cnt + "	Instructions = "+ instructionArray.size() +"\n");
+
+
 
             }
             else if (input[0].equals("h")){
@@ -649,8 +697,10 @@ public class lab4 {
 
             }
             else if (input[0].equals("p")){
-                System.out.println("pc      if/id   id/exe  exe/mem mem/wb");
+
+                System.out.println("\npc      if/id   id/exe  exe/mem mem/wb");
                 System.out.println(registers.get("pc")+"       "+pipe_regs.get(0).get(0)+"   "+pipe_regs.get(1).get(0)+"   "+pipe_regs.get(2).get(0)+"   "+pipe_regs.get(3).get(0));
+                System.out.print("\n");
 
 
             }
